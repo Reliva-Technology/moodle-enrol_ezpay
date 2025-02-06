@@ -28,7 +28,7 @@ This plugin integrates IIUM EzPay payment gateway with Moodle's payment subsyste
 1. Go to Site administration > Plugins > Payment gateways > Manage payment gateways
 2. Enable the IIUM EzPay payment gateway
 3. Configure the following settings:
-   - Enter your IIUM EzPay Merchant Code
+   - Enter your IIUM EzPay Merchant Code (default to 'moodle')
    - Enter the IIUM EzPay API URL (default: https://ezpay.iium.edu.my/payment/request)
 
 ## API Parameters
@@ -36,7 +36,7 @@ This plugin integrates IIUM EzPay payment gateway with Moodle's payment subsyste
 The plugin uses the following API parameters when communicating with IIUM EzPay:
 
 - `TRANS_ID`: Unique transaction ID (Moodle payment ID)
-- `MERCHANT_CODE`: Your IIUM EzPay merchant code
+- `MERCHANT_CODE`: Your IIUM EzPay merchant code (default to 'moodle')
 - `RETURN_URL`: URL where user will be redirected after payment
 - `AMOUNT`: Payment amount
 - `EMAIL`: User's email address
