@@ -28,4 +28,16 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading('paygw_ezpay_settings',
         get_string('pluginname', 'paygw_ezpay'),
         get_string('pluginname_desc', 'paygw_ezpay')));
+
+    $settings->add(new admin_setting_configtext('paygw_ezpay/merchantcode',
+        get_string('merchantcode', 'paygw_ezpay'),
+        get_string('merchantcode_desc', 'paygw_ezpay'),
+        '',
+        PARAM_TEXT));
+
+    $settings->add(new admin_setting_configtext('paygw_ezpay/apiurl',
+        get_string('apiurl', 'paygw_ezpay'),
+        get_string('apiurl_desc', 'paygw_ezpay'),
+        '',
+        PARAM_URL));
 }
