@@ -58,7 +58,11 @@ class gateway extends \core_payment\gateway {
         $mform->addElement('text', 'apiurl', get_string('apiurl', 'paygw_ezpay'));
         $mform->setType('apiurl', PARAM_URL);
         $mform->setDefault('apiurl', 'https://ezpay.iium.edu.my/payment/request');
-        $mform->addHelpButton('apiurl', 'apiurl', 'paygw_ezpay');
+        
+        // Add help text directly as a static element
+        $helptext = 'The API URL is the endpoint where payment requests will be sent. The default URL is the production endpoint. Change this only if you need to use a different endpoint for testing or if instructed by IIUM EzPay support.';
+        $mform->addElement('static', 'apiurl_help_text', '', $helptext);
+        
         $mform->addRule('apiurl', get_string('required'), 'required', null, 'client');
     }
 

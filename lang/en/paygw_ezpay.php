@@ -28,6 +28,10 @@ $string['gatewaydescription'] = 'IIUM EzPay is the official payment gateway for 
 $string['gatewayname'] = 'IIUM EzPay';
 $string['merchantcode'] = 'Merchant Code';
 $string['merchantcode_desc'] = 'The merchant code provided by IIUM EzPay';
+$string['merchantcode_help'] = 'Enter the merchant code that was provided to you by IIUM EzPay. This code uniquely identifies your institution in the payment system.';
 $string['apiurl'] = 'API URL';
 $string['apiurl_desc'] = 'The URL of the IIUM EzPay API';
+$string['apiurl_help'] = 'The API URL is the endpoint where payment requests will be sent. The default URL is the production endpoint. Change this only if you need to use a different endpoint for testing or if instructed by IIUM EzPay support.';
+// Alternative help string format
+$string['paygw_ezpay_apiurl_help'] = 'The API URL is the endpoint where payment requests will be sent. The default URL is the production endpoint. Change this only if you need to use a different endpoint for testing or if instructed by IIUM EzPay support.';
 $string['privacy:metadata'] = 'The IIUM EzPay plugin does not store any personal data.';
