@@ -43,6 +43,22 @@ class gateway extends \core_payment\gateway {
     }
 
     /**
+     * Get the API endpoint URL based on the environment setting
+     *
+     * @return string The API endpoint URL
+     */
+    public static function get_api_endpoint(): string {
+        $environment = get_config('paygw_ezpay', 'environment');
+        
+        if ($environment === 'production') {
+            return 'https://ezpay.iium.edu.my/payment/request';
+        } else {
+            // Default to staging
+            return 'https://ezypay-stg.iium.edu.my/payment/request';
+        }
+    }
+
+    /**
      * Configuration form for the gateway instance
      *
      * @param account_gateway $form The form instance
@@ -55,15 +71,26 @@ class gateway extends \core_payment\gateway {
         $mform->addHelpButton('merchantcode', 'merchantcode', 'paygw_ezpay');
         $mform->addRule('merchantcode', get_string('required'), 'required', null, 'client');
 
+        // Get the API endpoint based on environment
+        $apiurl = self::get_api_endpoint();
+        
         $mform->addElement('text', 'apiurl', get_string('apiurl', 'paygw_ezpay'));
         $mform->setType('apiurl', PARAM_URL);
-        $mform->setDefault('apiurl', 'https://ezpay.iium.edu.my/payment/request');
-        
-        // Add help text directly as a static element
-        $helptext = 'The API URL is the endpoint where payment requests will be sent. The default URL is the production endpoint. Change this only if you need to use a different endpoint for testing or if instructed by IIUM EzPay support.';
-        $mform->addElement('static', 'apiurl_help_text', '', $helptext);
-        
+        $mform->setDefault('apiurl', $apiurl);
+        $mform->addHelpButton('apiurl', 'apiurl', 'paygw_ezpay');
         $mform->addRule('apiurl', get_string('required'), 'required', null, 'client');
+        
+        // Add service code field
+        $mform->addElement('text', 'servicecode', get_string('servicecode', 'paygw_ezpay'));
+        $mform->setType('servicecode', PARAM_TEXT);
+        $mform->setDefault('servicecode', '001');
+        $mform->addHelpButton('servicecode', 'servicecode', 'paygw_ezpay');
+        
+        // Add option to use redirect method instead of modal
+        $mform->addElement('advcheckbox', 'useredirect', get_string('useredirect', 'paygw_ezpay'), 
+            get_string('useredirect_desc', 'paygw_ezpay'));
+        $mform->setType('useredirect', PARAM_BOOL);
+        $mform->setDefault('useredirect', 1); // Set to true by default
     }
 
     /**
@@ -82,5 +109,31 @@ class gateway extends \core_payment\gateway {
         if (empty($data->apiurl)) {
             $errors['apiurl'] = get_string('required');
         }
+        
+        if (empty($data->servicecode)) {
+            $errors['servicecode'] = get_string('required');
+        }
+    }
+    
+    /**
+     * Get the list of actions that can be performed by this gateway.
+     *
+     * @return string[]
+     */
+    public function get_actions(): array {
+        return [
+            'ezpay/redirect',
+        ];
+    }
+    
+    /**
+     * Determines if this gateway should use a redirect payment flow instead of a modal popup.
+     *
+     * @param int $accountid The account ID
+     * @return bool
+     */
+    public static function uses_redirect(int $accountid): bool {
+        $config = (object)self::get_gateway_configuration($accountid);
+        return !empty($config->useredirect);
     }
 }

@@ -46,12 +46,32 @@ class enrol_ezpay_payment_form {
     }
     
     /**
+     * Get the EzPay API endpoint based on environment setting
+     * 
+     * @return string API endpoint URL
+     */
+    protected function get_api_endpoint() {
+        global $CFG;
+        
+        // Get environment setting
+        $environment = get_config('enrol_ezpay', 'environment');
+        
+        // Return appropriate endpoint based on environment
+        if ($environment === 'production') {
+            return 'https://ezpay.iium.edu.my/payment/request';
+        } else {
+            // Default to staging
+            return 'https://ezypay-stg.iium.edu.my/payment/request';
+        }
+    }
+    
+    /**
      * Render the payment form/button
      * 
      * @return string HTML output
      */
     public function render() {
-        global $CFG, $DB, $USER, $OUTPUT;
+        global $CFG, $DB, $USER, $OUTPUT, $PAGE;
         
         $course = $DB->get_record('course', array('id' => $this->instance->courseid), '*', MUST_EXIST);
         
@@ -69,17 +89,42 @@ class enrol_ezpay_payment_form {
         $paymentarea = 'fee';
         $itemid = $this->instance->id;
         
-        // Create payment button
-        $button = new \core_payment\form\account_gateway_button(
-            $component,
-            $paymentarea,
-            $itemid,
-            $this->instance->cost,
-            $this->instance->currency,
-            $this->userid,
-            $description
-        );
+        // Check if redirect method should be used
+        $config = get_config('paygw_ezpay');
+        $useredirect = !empty($config->useredirect);
         
-        return $button->render();
+        if ($useredirect) {
+            // Create a direct payment link instead of modal button
+            $redirecturl = new moodle_url('/payment/gateway/ezpay/redirect.php', [
+                'component' => $component,
+                'paymentarea' => $paymentarea,
+                'itemid' => $itemid,
+                'description' => $description
+            ]);
+            
+            $button = new single_button($redirecturl, get_string('sendpaymentbutton', 'enrol_fee'), 'get');
+            return $OUTPUT->render($button);
+        } else {
+            // Create a direct payment link for the button
+            $redirecturl = new moodle_url('/payment/gateway/ezpay/redirect.php', [
+                'component' => $component,
+                'paymentarea' => $paymentarea,
+                'itemid' => $itemid,
+                'description' => $description
+            ]);
+            
+            // Create payment button with core payment API
+            $button = new \core_payment\form\account_gateway_button(
+                $component,
+                $paymentarea,
+                $itemid,
+                $this->instance->cost,
+                $this->instance->currency,
+                $this->userid,
+                $description
+            );
+            
+            return $button->render();
+        }
     }
 }
