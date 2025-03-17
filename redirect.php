@@ -43,13 +43,13 @@ $amount = \core_payment\helper::get_rounded_cost($amount, $currency, $surcharge)
 // Set up the page
 $PAGE->set_context(\context_system::instance());
 $PAGE->set_url(new moodle_url('/payment/gateway/ezpay/redirect.php'));
-$PAGE->set_title(get_string('redirectingtoezpay', 'paygw_ezpay'));
-$PAGE->set_heading(get_string('redirectingtoezpay', 'paygw_ezpay'));
+$PAGE->set_title(get_string('redirecting', 'paygw_ezpay'));
+$PAGE->set_heading(get_string('redirecting', 'paygw_ezpay'));
 
 echo $OUTPUT->header();
 
 // Display a loading message
-echo $OUTPUT->notification(get_string('redirectingtoezpay', 'paygw_ezpay'), 'info');
+echo $OUTPUT->notification(get_string('redirect_message', 'paygw_ezpay'), 'info');
 
 // Get the redirect URL
 $redirecturl = \paygw_ezpay\redirect::process_payment(

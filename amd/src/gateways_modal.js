@@ -23,6 +23,7 @@
 
 import Templates from 'core/templates';
 import Modal from 'core/modal';
+import Notification from 'core/notification';
 
 /**
  * Show modal with the EzPay placeholder.
@@ -35,7 +36,7 @@ const showModalWithPlaceholder = async() => {
         show: true,
         removeOnClose: true,
     });
-    modal.destroy();
+    return modal;
 };
 
 /**
@@ -49,13 +50,22 @@ const showModalWithPlaceholder = async() => {
  */
 export const process = (component, paymentArea, itemId, description) => {
     return showModalWithPlaceholder()
-        .then(() => {
-            location.href = M.cfg.wwwroot + '/payment/gateway/ezpay/pay.php?' +
-                'sesskey=' + M.cfg.sesskey +
-                '&component=' + component +
-                '&paymentarea=' + paymentArea +
-                '&itemid=' + itemId +
-                '&description=' + description;
+        .then((modal) => {
+            // Keep the modal open while redirecting
+            try {
+                const redirectUrl = M.cfg.wwwroot + '/payment/gateway/ezpay/redirect.php?' +
+                    'sesskey=' + M.cfg.sesskey +
+                    '&component=' + encodeURIComponent(component) +
+                    '&paymentarea=' + encodeURIComponent(paymentArea) +
+                    '&itemid=' + encodeURIComponent(itemId) +
+                    '&description=' + encodeURIComponent(description);
+                
+                window.location.href = redirectUrl;
+            } catch (error) {
+                modal.destroy();
+                Notification.exception(error);
+            }
             return new Promise(() => null);
-        });
+        })
+        .catch(Notification.exception);
 };
