@@ -31,3 +31,10 @@ $string['merchantcode_help'] = 'The merchant code provided by IIUM EzPay';
 $string['apiurl'] = 'API URL';
 $string['apiurl_help'] = 'The URL of the IIUM EzPay API';
 $string['privacy:metadata'] = 'The IIUM EzPay plugin does not store any personal data.';
+
+// New strings for payment process
+$string['redirecting'] = 'Redirecting to payment gateway...';
+$string['redirect_message'] = 'Please wait while we redirect you to IIUM EzPay...';
+$string['paymentsuccessful'] = 'Your payment was successful';
+$string['paymentcancelled'] = 'Payment was cancelled';
+$string['internalerror'] = 'An internal error occurred. Please contact the site administrator.';
