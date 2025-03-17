@@ -29,6 +29,17 @@ if ($ADMIN->fulltree) {
         get_string('pluginname', 'paygw_ezpay'),
         get_string('pluginname_desc', 'paygw_ezpay')));
 
+    // Environment setting (staging/production)
+    $environment_options = array(
+        'staging' => get_string('environment_staging', 'paygw_ezpay'),
+        'production' => get_string('environment_production', 'paygw_ezpay')
+    );
+    $settings->add(new admin_setting_configselect('paygw_ezpay/environment',
+        get_string('environment', 'paygw_ezpay'),
+        get_string('environment_desc', 'paygw_ezpay'),
+        'staging',
+        $environment_options));
+
     $settings->add(new admin_setting_configtext('paygw_ezpay/merchantcode',
         get_string('merchantcode', 'paygw_ezpay'),
         get_string('merchantcode_desc', 'paygw_ezpay'),
@@ -40,4 +51,10 @@ if ($ADMIN->fulltree) {
         get_string('apiurl_desc', 'paygw_ezpay'),
         '',
         PARAM_URL));
+        
+    $settings->add(new admin_setting_configtext('paygw_ezpay/servicecode',
+        get_string('servicecode', 'paygw_ezpay'),
+        get_string('servicecode_desc', 'paygw_ezpay'),
+        '001',
+        PARAM_TEXT));
 }

@@ -15,17 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * EzPay enrolment plugin event handler definition.
  *
- * @package    paygw_ezpay
+ * @package    enrol_ezpay
  * @copyright  2025 Fadli Saad <fadlisaad@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025031001;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2020061500;        // Requires this Moodle version
-$plugin->component = 'paygw_ezpay';    // Full name of the plugin (used for diagnostics)
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.1';             // Human-readable version name
+// List of observers.
+$observers = array(
+    array(
+        'eventname'   => '\core\event\course_created',
+        'callback'    => 'enrol_ezpay_observer::course_created',
+    ),
+);

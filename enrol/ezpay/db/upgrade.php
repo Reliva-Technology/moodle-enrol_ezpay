@@ -15,17 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * This file keeps track of upgrades to the ezpay enrolment plugin
  *
- * @package    paygw_ezpay
+ * @package    enrol_ezpay
  * @copyright  2025 Fadli Saad <fadlisaad@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025031001;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2020061500;        // Requires this Moodle version
-$plugin->component = 'paygw_ezpay';    // Full name of the plugin (used for diagnostics)
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.1';             // Human-readable version name
+/**
+ * Upgrade function for the ezpay enrolment plugin.
+ * @param int $oldversion the version we are upgrading from
+ * @return bool result
+ */
+function xmldb_enrol_ezpay_upgrade($oldversion) {
+    global $DB;
+    
+    // Moodle v2.8.0 release upgrade line.
+    // Put any upgrade step following this.
+    
+    return true;
+}

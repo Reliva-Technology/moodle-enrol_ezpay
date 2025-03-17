@@ -15,17 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * EzPay enrollment plugin version specification.
  *
- * @package    paygw_ezpay
+ * @package    enrol_ezpay
  * @copyright  2025 Fadli Saad <fadlisaad@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025031001;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2020061500;        // Requires this Moodle version
-$plugin->component = 'paygw_ezpay';    // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2025022701;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2022112800;        // Requires this Moodle version (4.1+)
+$plugin->component = 'enrol_ezpay';     // Full name of the plugin (used for diagnostics)
+$plugin->cron      = 60*60*4;           // Run cron every 4 hours
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.1';             // Human-readable version name
+$plugin->release   = '1.0.0';
+$plugin->dependencies = array(
+    'paygw_ezpay' => ANY_VERSION,       // Requires EzPay payment gateway
+);

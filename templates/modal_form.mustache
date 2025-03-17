@@ -1,0 +1,58 @@
+{{!  
+    This file is part of Moodle - http://moodle.org/
+    
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template paygw_ezpay/modal_form
+    
+    Template for the modal payment form.
+    
+    Classes required for JS:
+    * none
+    
+    Data attributes required for JS:
+    * none
+    
+    Context variables required for this template:
+    * component - The component name
+    * paymentarea - The payment area
+    * itemid - The item ID
+    
+    Example context (json):
+    {
+        "component": "enrol_ezpay",
+        "paymentarea": "fee",
+        "itemid": 1
+    }
+}}
+<div class="paygw_ezpay-modal-form">
+    <button type="button" class="btn btn-primary" id="ezpay-modal-button">
+        {{#str}} proceedtopayment, paygw_ezpay {{/str}}
+    </button>
+</div>
+
+<script>
+    // When the button is clicked, redirect to the payment page
+    document.getElementById('ezpay-modal-button').addEventListener('click', function() {
+        var redirectUrl = M.cfg.wwwroot + '/payment/gateway/ezpay/redirect.php';
+        var component = '{{component}}';
+        var paymentarea = '{{paymentarea}}';
+        var itemid = {{itemid}};
+        
+        window.location.href = redirectUrl + '?component=' + component + 
+                              '&paymentarea=' + paymentarea + 
+                              '&itemid=' + itemid;
+    });
+</script>
