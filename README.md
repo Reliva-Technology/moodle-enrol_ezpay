@@ -42,6 +42,28 @@ The plugin uses the following API parameters when communicating with IIUM EzPay:
 - `EMAIL`: User's email address
 - `SOURCE`: Set to "MOODLE"
 
+## API Testing Tool
+
+The plugin includes a comprehensive API testing tool to help diagnose connectivity issues and test the payment gateway integration:
+
+1. Access the API testing tool at: `https://your-moodle-site.com/payment/gateway/ezpay/api_test.php`
+2. The tool provides the following features:
+   - Test API connectivity with different request configurations
+   - Customize headers, user agent, and content type
+   - View detailed request and response information
+   - Test different data formats (JSON, form-encoded, raw)
+   - View HTML responses in a separate viewer
+   - Generate equivalent cURL commands for command-line testing
+
+### Troubleshooting with the API Test Tool
+
+If you're experiencing issues with the payment gateway:
+
+1. Compare the API responses between Postman and the Moodle server
+2. Try different user agent strings and content types
+3. Check for HTML responses that might not be properly detected
+4. Use the verbose connection logs to identify any network or SSL issues
+
 ## Support
 
 For support, please contact [fadlisaad@gmail.com](mailto:fadlisaad@gmail.com).
