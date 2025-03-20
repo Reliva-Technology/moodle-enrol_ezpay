@@ -80,6 +80,7 @@ class redirect {
             'MERCHANT_CODE' => $config->merchantcode,
             'SERVICE_CODE' => $serviceCode,
             'RETURN_URL' => (new \moodle_url('/payment/gateway/ezpay/process.php'))->out(false),
+            'CANCEL_URL' => (new \moodle_url('/payment/gateway/ezpay/cancel.php'))->out(false),
             'EMAIL' => $USER->email,
             'SOURCE' => 'MOODLE',
             'PAYEE_ID' => $USER->id,
