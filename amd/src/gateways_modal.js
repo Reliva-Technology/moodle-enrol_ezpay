@@ -14,81 +14,58 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * IIUM EzPay payment gateway modal module.
+ * This module is responsible for EzPay content in the gateways modal.
  *
  * @module     paygw_ezpay/gateways_modal
  * @copyright  2025 Fadli Saad <fadlisaad@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define([
-    'jquery',
-    'core/modal_factory',
-    'core/modal_events',
-    'core/str',
-    'core/notification'
-], function($, ModalFactory, ModalEvents, Str, Notification) {
+import Templates from 'core/templates';
+import Modal from 'core/modal';
+import Notification from 'core/notification';
 
-    /**
-     * Creates and shows a modal that contains the EzPay payment form.
-     *
-     * @param {String} url The URL for the payment form
-     * @param {String} component The component name
-     * @param {String} paymentArea The payment area
-     * @param {Number} itemId The item ID
-     * @param {String} description The payment description
-     */
-    var process = function(url, component, paymentArea, itemId, description) {
-        // Get the required strings
-        Str.get_string('pluginname', 'paygw_ezpay')
-            .then(function(title) {
-                return Str.get_string('redirectingtoezpay', 'paygw_ezpay')
-                    .then(function(redirectText) {
-                        // Create the modal
-                        return ModalFactory.create({
-                            type: ModalFactory.types.DEFAULT,
-                            title: title,
-                            body: '<div class="text-center"><p>' + redirectText + '</p>' +
-                                  '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>',
-                            large: true,
-                        });
-                    });
-            })
-            .then(function(modal) {
-                // Handle hidden event
-                modal.getRoot().on(ModalEvents.hidden, function() {
-                    // Destroy when hidden
-                    modal.destroy();
-                });
+/**
+ * Show modal with the EzPay placeholder.
+ *
+ * @returns {Promise}
+ */
+const showModalWithPlaceholder = async() => {
+    const modal = await Modal.create({
+        body: await Templates.render('paygw_ezpay/button_placeholder', {}),
+        show: true,
+        removeOnClose: true,
+    });
+    return modal;
+};
 
-                // Show the modal
-                modal.show();
-
-                // Redirect to payment page after showing the modal
-                window.location.href = url + '?component=' + component + '&paymentarea=' + paymentArea + 
-                                       '&itemid=' + itemId + '&description=' + encodeURIComponent(description);
-
-                return modal;
-            })
-            .catch(Notification.exception);
-    };
-
-    /**
-     * Initializes the payment process.
-     *
-     * @param {String} component The component name
-     * @param {String} paymentArea The payment area
-     * @param {Number} itemId The item ID
-     * @param {String} description The payment description
-     */
-    var init = function(component, paymentArea, itemId, description) {
-        // Get the redirect URL from the server
-        var redirectUrl = M.cfg.wwwroot + '/payment/gateway/ezpay/redirect.php';
-        process(redirectUrl, component, paymentArea, itemId, description);
-    };
-
-    return {
-        init: init,
-        process: process
-    };
-});
+/**
+ * Process the payment.
+ *
+ * @param {String} component
+ * @param {String} paymentArea
+ * @param {String} itemId
+ * @param {String} description
+ * @returns {Promise<>}
+ */
+export const process = (component, paymentArea, itemId, description) => {
+    return showModalWithPlaceholder()
+        .then((modal) => {
+            // Keep the modal open while redirecting
+            try {
+                const redirectUrl = M.cfg.wwwroot + '/payment/gateway/ezpay/redirect.php?' +
+                    'sesskey=' + M.cfg.sesskey +
+                    '&component=' + encodeURIComponent(component) +
+                    '&paymentarea=' + encodeURIComponent(paymentArea) +
+                    '&itemid=' + encodeURIComponent(itemId) +
+                    '&description=' + encodeURIComponent(description);
+                
+                window.location.href = redirectUrl;
+            } catch (error) {
+                modal.destroy();
+                Notification.exception(error);
+            }
+            return new Promise(() => null);
+        })
+        .catch(Notification.exception);
+};

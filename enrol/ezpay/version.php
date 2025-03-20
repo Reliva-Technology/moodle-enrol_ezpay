@@ -24,12 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025022701;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2025031702;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2022112800;        // Requires this Moodle version (4.1+)
 $plugin->component = 'enrol_ezpay';     // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 60*60*4;           // Run cron every 4 hours
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0.0';
+$plugin->release   = '1.0.2';
 $plugin->dependencies = array(
     'paygw_ezpay' => ANY_VERSION,       // Requires EzPay payment gateway
 );
