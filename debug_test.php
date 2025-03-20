@@ -15,17 +15,40 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Debug test file for IIUM EzPay payment gateway.
  *
  * @package    paygw_ezpay
  * @copyright  2025 Fadli Saad <fadlisaad@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025031006;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2020061500;        // Requires this Moodle version
-$plugin->component = 'paygw_ezpay';    // Full name of the plugin (used for diagnostics)
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.5';             // Human-readable version name
+require_once(__DIR__ . '/../../../config.php');
+
+// Set up the page
+$PAGE->set_context(\context_system::instance());
+$PAGE->set_url(new moodle_url('/payment/gateway/ezpay/debug_test.php'));
+$PAGE->set_title('Debug Test');
+$PAGE->set_heading('Debug Test');
+
+echo $OUTPUT->header();
+
+// Test debugging
+debugging('EZPAY DEBUG TEST: This is a test debug message', DEBUG_DEVELOPER);
+
+// Display some information
+echo '<h3>Debug Test</h3>';
+echo '<p>This page tests if debugging is working properly.</p>';
+
+// Display configuration
+echo '<h3>Configuration</h3>';
+$config = get_config('paygw_ezpay');
+echo '<pre>';
+print_r($config);
+echo '</pre>';
+
+// Display PHP info
+echo '<h3>PHP Info</h3>';
+echo '<p>PHP Version: ' . phpversion() . '</p>';
+
+echo $OUTPUT->footer();

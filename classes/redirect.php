@@ -50,6 +50,9 @@ class redirect {
         // Get the payment gateway configuration
         $config = (object) get_config('paygw_ezpay');
         
+        // Debug the API URL
+        debugging('EzPay API URL: ' . $config->apiurl, DEBUG_DEVELOPER);
+        
         // Create a payment record
         $paymentid = \core_payment\helper::save_payment(
             $component,
@@ -85,21 +88,39 @@ class redirect {
             'PAYMENT_DETAILS' => $description
         ];
         
+        // Debug the request data
+        debugging('EzPay Request Data: ' . json_encode($data), DEBUG_DEVELOPER);
+        
         // Send the request to IIUM EzPay
         $ch = curl_init($config->apiurl);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification for testing
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false); // Disable SSL host verification for testing
         $response = curl_exec($ch);
+        
+        // Check for curl errors
+        if (curl_errno($ch)) {
+            debugging('Curl error: ' . curl_error($ch), DEBUG_DEVELOPER);
+        }
+        
         curl_close($ch);
+        
+        // Debug the response
+        debugging('EzPay Response: ' . $response, DEBUG_DEVELOPER);
         
         $result = json_decode($response);
         
-        if (!empty($result->redirect_url)) {
+        if (!empty($result) && !empty($result->redirect_url)) {
+            debugging('Redirecting to: ' . $result->redirect_url, DEBUG_DEVELOPER);
             return $result->redirect_url;
+        } else {
+            // Log the error
+            debugging('Error in EzPay response: ' . $response, DEBUG_DEVELOPER);
+            
+            // If there's an error, redirect to the cancel page
+            return new \moodle_url('/payment/gateway/ezpay/cancel.php', ['id' => $paymentid]);
         }
-        
-        // If there's an error, redirect to the cancel page
-        return new \moodle_url('/payment/gateway/ezpay/cancel.php', ['id' => $paymentid]);
     }
 }

@@ -15,41 +15,67 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Process IIUM EzPay payment response.
+ * Process callback from IIUM EzPay payment gateway.
  *
  * @package    paygw_ezpay
  * @copyright  2025 Fadli Saad <fadlisaad@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/payment/gateway/ezpay/lib.php');
 
-$data = $_POST;
+// Get response data - check both POST and GET as the gateway might use either
+$data = empty($_POST) ? $_GET : $_POST;
 
-// Get the payment record.
-$paymentid = $data['TRANS_ID'];
-$payment = $DB->get_record('payments', ['id' => $paymentid], '*', MUST_EXIST);
+// Log the received data for debugging
+debugging('EZPAY PROCESS: Callback received with data: ' . json_encode($data), DEBUG_DEVELOPER);
 
-// Process the payment response.
-if (!empty($data)) {
-    // Add your payment verification logic here.
-    // You should verify the payment status and other necessary checks.
+// Check if we have transaction data
+if (!empty($data['TRANS_ID'])) {
+    // Extract the payment ID from the transaction ID (remove 'MOODLE-' prefix)
+    $transid = $data['TRANS_ID'];
+    $paymentid = preg_replace('/^MOODLE-/', '', $transid);
     
-    $paymentrecord = new stdClass();
-    $paymentrecord->payment_id = $payment->id;
-    $paymentrecord->payment_reference = $data['TRANS_ID'];
-    $paymentrecord->status = 'success'; // Update based on actual payment status
+    debugging('EZPAY PROCESS: Processing transaction ID: ' . $transid . ', Payment ID: ' . $paymentid, DEBUG_DEVELOPER);
     
-    // Record the payment in Moodle.
-    \core_payment\helper::save_payment($paymentrecord);
+    // Get the payment record
+    global $DB;
+    $payment = $DB->get_record('payments', ['id' => $paymentid], '*');
     
-    // Deliver the payment completion event.
-    \core_payment\helper::deliver_order($payment->component, $payment->paymentarea, $payment->itemid, $payment->userid, $payment->amount);
-    
-    // Redirect to success page.
-    redirect(new moodle_url('/payment/gateway/ezpay/success.php', ['id' => $payment->id]));
+    if ($payment) {
+        debugging('EZPAY PROCESS: Payment record found for ID: ' . $paymentid, DEBUG_DEVELOPER);
+        
+        // Process the payment response
+        $status = isset($data['STATUS']) ? $data['STATUS'] : '';
+        
+        debugging('EZPAY PROCESS: Payment status: ' . $status, DEBUG_DEVELOPER);
+        
+        // Check if payment was successful (adjust based on EzPay's success status code)
+        if ($status == 'SUCCESS' || $status == '00' || $status == 'PAID' || empty($status)) {
+            debugging('EZPAY PROCESS: Payment successful, delivering order', DEBUG_DEVELOPER);
+            
+            // Mark payment as successful
+            \core_payment\helper::deliver_order($payment->component, $payment->paymentarea, $payment->itemid, $payment->userid, $payment->amount);
+            
+            // Redirect to success page
+            redirect(new \moodle_url('/payment/gateway/ezpay/success.php', ['id' => $payment->id]));
+        } else {
+            debugging('EZPAY PROCESS: Payment failed with status: ' . $status, DEBUG_DEVELOPER);
+            
+            // Payment failed
+            redirect(new \moodle_url('/payment/gateway/ezpay/cancel.php', ['id' => $payment->id]));
+        }
+    } else {
+        debugging('EZPAY PROCESS: Payment record not found for ID: ' . $paymentid, DEBUG_DEVELOPER);
+        
+        // Payment record not found
+        echo 'Error: Payment record not found.';
+    }
 } else {
-    // Payment failed or was cancelled.
-    redirect(new moodle_url('/payment/gateway/ezpay/cancel.php', ['id' => $payment->id]));
+    debugging('EZPAY PROCESS: No transaction ID found in callback data', DEBUG_DEVELOPER);
+    
+    // No transaction ID
+    echo 'Error: No transaction ID provided.';
 }

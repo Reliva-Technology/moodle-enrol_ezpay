@@ -59,3 +59,5 @@ $string['redirectingtoezpay'] = 'Redirecting to IIUM EzPay payment gateway...';
 $string['paymentcancelled'] = 'Payment was cancelled.';
 $string['paymentsuccessful'] = 'Payment was successful.';
 $string['proceedtopayment'] = 'Proceed to payment';
+$string['clickheretoproceed'] = 'Click here to proceed to payment if you are not automatically redirected.';
+$string['processpayment'] = 'Process Payment';

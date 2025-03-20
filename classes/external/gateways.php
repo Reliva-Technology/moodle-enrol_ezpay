@@ -149,6 +149,10 @@ class gateways extends external_api {
 
         $config = (object) \paygw_ezpay\gateway::get_gateway_configuration($accountid);
         $useredirect = !empty($config->useredirect);
+        
+        // Get the payable object to get the description
+        $payable = new \core_payment\payable($component, $paymentarea, $itemid);
+        $description = $payable->get_description();
 
         if ($useredirect) {
             // For redirect method, we just need to redirect to the payment page
@@ -156,6 +160,7 @@ class gateways extends external_api {
                 'component' => $component,
                 'paymentarea' => $paymentarea,
                 'itemid' => $itemid,
+                'description' => $description, // Add the description parameter
             ]);
 
             return json_encode([
@@ -170,6 +175,7 @@ class gateways extends external_api {
                     'component' => $component,
                     'paymentarea' => $paymentarea,
                     'itemid' => $itemid,
+                    'description' => $description, // Add the description parameter
                 ])
             ]);
         }

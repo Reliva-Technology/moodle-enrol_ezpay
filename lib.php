@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Library functions for the IIUM EzPay payment gateway.
  *
  * @package    paygw_ezpay
  * @copyright  2025 Fadli Saad <fadlisaad@gmail.com>
@@ -24,8 +24,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025031006;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2020061500;        // Requires this Moodle version
-$plugin->component = 'paygw_ezpay';    // Full name of the plugin (used for diagnostics)
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.5';             // Human-readable version name
+/**
+ * Map gateway actions to the appropriate handler.
+ *
+ * @param string $action The action to map
+ * @return \moodle_url The URL to handle the action
+ */
+function paygw_ezpay_get_payment_action_url(string $action): \moodle_url {
+    // Map the action to the appropriate handler
+    if ($action === 'ezpay/redirect') {
+        return new \moodle_url('/payment/gateway/ezpay/redirect.php');
+    }
+    throw new \coding_exception('Unrecognized payment action');
+}

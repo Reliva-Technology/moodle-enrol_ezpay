@@ -29,12 +29,14 @@
     * component - The component name
     * paymentarea - The payment area
     * itemid - The item ID
+    * description - The payment description
     
     Example context (json):
     {
         "component": "enrol_ezpay",
         "paymentarea": "fee",
-        "itemid": 1
+        "itemid": 1,
+        "description": "Course enrollment fee"
     }
 }}
 <div class="paygw_ezpay-modal-form">
@@ -50,9 +52,11 @@
         var component = '{{component}}';
         var paymentarea = '{{paymentarea}}';
         var itemid = {{itemid}};
+        var description = '{{description}}';
         
         window.location.href = redirectUrl + '?component=' + component + 
-                              '&paymentarea=' + paymentarea + 
-                              '&itemid=' + itemid;
+                               '&paymentarea=' + paymentarea + 
+                               '&itemid=' + itemid +
+                               '&description=' + encodeURIComponent(description);
     });
 </script>
