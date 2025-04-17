@@ -1,0 +1,103 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template enrol_ezpay/ezpay_callback
+
+    This template renders the main content area for the ezpay callback.
+
+    Example context (json):
+    {
+        "success": true,
+        "receipt_no": "CM12825000405",
+        "payment_date": "2025-03-21",
+        "amount": "100.00",
+        "buyer_name": "NAJWA SYAFIQA BINTI MOHD",
+        "payment_mode": "fpx",
+        "buyer_bank": "MAYBANK2U",
+        "transaction_id": "AA095936",
+        "course_name": "Introduction to Programming",
+        "course_url": "http://moodle.local/course/view.php?id=2",
+        "return_header": "Payment Successful",
+        "return_sub_header": "Thank you for your payment"
+    }
+}}
+
+<div class="ezpay-callback">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title text-center mb-4">{{return_header}}</h2>
+            <p class="text-center mb-4">{{return_sub_header}}</p>
+            
+            <div class="payment-details">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Receipt No</th>
+                            <td>{{receipt_no}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Payment Date</th>
+                            <td>{{payment_date}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Amount</th>
+                            <td>RM {{amount}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Student Name</th>
+                            <td>{{buyer_name}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Payment Method</th>
+                            <td>{{payment_mode}} ({{buyer_bank}})</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Transaction ID</th>
+                            <td>{{transaction_id}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Course</th>
+                            <td>{{course_name}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{course_url}}" class="btn btn-primary">Go to Course</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.ezpay-callback {
+    max-width: 600px;
+    margin: 2rem auto;
+}
+.payment-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.25rem;
+}
+.payment-details table {
+    margin-bottom: 0;
+}
+.payment-details th {
+    width: 40%;
+}
+</style>

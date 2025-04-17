@@ -1,69 +1,39 @@
-# IIUM EzPay Payment Gateway for Moodle
+[![ci](https://github.com/Reliva-Technology/ezpay-moodle-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/Reliva-Technology/ezpay-moodle-plugin/actions/workflows/ci.yml)
+# Moodle Payment Gateway EZPay
 
-This plugin integrates IIUM EzPay payment gateway with Moodle's payment subsystem, allowing users to make payments through the IIUM EzPay platform.
+Welcome to the EZPay plugin repository for Moodle. This plugin enables payment-based enrollment in Moodle courses using EZPay payment gateway. Following Moodle's documentation on enrollment plugins, EZPay provides a seamless way to handle course payments.
 
-## Features
+## Steps for Integration
+1. Download and install the plugin
+2. Configure your EZPay merchant credentials
+3. Configure the Moodle enrollment with EZPay payment
+4. Add 'EZPay Payment' to the Moodle courses where you want to enable paid enrollment
 
-- Seamless integration with Moodle's payment system
-- Supports payment validation and verification
-- Configurable merchant settings
-- Automatic payment status updates
-- Secure payment processing
+### Installation
+After downloading the plugin:
+1. Login as admin to your Moodle site
+2. Go to **Site administration** -> **Plugins** -> **Install plugins**
+3. Choose or drag-and-drop the plugin zip file to the box
+4. Click **install plugin from ZIP file**
+5. Click **continue** after installation completes
 
-## Requirements
+### Configure EZPay Payment as Enrollment Method
+1. Go to **Site administration** -> **Plugins** -> **Enrolments** -> **Manage enrol plugins**
+2. Locate **EZPay Payment** in the list and ensure it is enabled
+3. Configure your **API key** and other required credentials
+4. Set the appropriate **environment** (production/sandbox)
+5. Configure enrollment settings within **EZPay Payment**
 
-- Moodle 4.1 or higher
-- PHP 7.4 or higher
-- curl extension enabled
+>***Note: Using incorrect environment settings will result in denied payment access***
 
-## Installation
-
-1. Create a directory `payment/gateway/ezpay` in your Moodle installation
-2. Copy all the plugin files into this directory
-3. Visit your Moodle site's administration area to complete the installation
-4. Configure the plugin settings
-
-## Configuration
-
-1. Go to Site administration > Plugins > Payment gateways > Manage payment gateways
-2. Enable the IIUM EzPay payment gateway
-3. Configure the following settings:
-   - Enter your IIUM EzPay Merchant Code (default to 'moodle')
-   - Enter the IIUM EzPay API URL (default: https://ezpay.iium.edu.my/payment/request)
-
-## API Parameters
-
-The plugin uses the following API parameters when communicating with IIUM EzPay:
-
-- `TRANS_ID`: Unique transaction ID (Moodle payment ID)
-- `MERCHANT_CODE`: Your IIUM EzPay merchant code (default to 'moodle')
-- `RETURN_URL`: URL where user will be redirected after payment
-- `AMOUNT`: Payment amount
-- `EMAIL`: User's email address
-- `SOURCE`: Set to "MOODLE"
-
-## API Testing Tool
-
-The plugin includes a comprehensive API testing tool to help diagnose connectivity issues and test the payment gateway integration:
-
-1. Access the API testing tool at: `https://your-moodle-site.com/payment/gateway/ezpay/api_test.php`
-2. The tool provides the following features:
-   - Test API connectivity with different request configurations
-   - Customize headers, user agent, and content type
-   - View detailed request and response information
-   - Test different data formats (JSON, form-encoded, raw)
-   - View HTML responses in a separate viewer
-   - Generate equivalent cURL commands for command-line testing
-
-### Troubleshooting with the API Test Tool
-
-If you're experiencing issues with the payment gateway:
-
-1. Compare the API responses between Postman and the Moodle server
-2. Try different user agent strings and content types
-3. Check for HTML responses that might not be properly detected
-4. Use the verbose connection logs to identify any network or SSL issues
+### Add EZPay Payment to Courses
+1. Navigate to the desired course
+2. Go to **participants**
+3. Click the actions menu and select **Enrolment methods**
+4. Choose **EZPay Payment** from the Add dropdown menu
+5. Set the course cost in **Enrol cost** and click **Add method**
 
 ## Support
-
-For support, please contact [fadlisaad@gmail.com](mailto:fadlisaad@gmail.com).
+For support or inquiries, please contact:
+- Email: support@reliva.com.my
+- Website: https://reliva.com.my

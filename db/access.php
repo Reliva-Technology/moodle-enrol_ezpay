@@ -15,21 +15,45 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Controls the version for the ezpay enrolment plugin
+ * Capabilities for ezpay enrolment plugin
  *
  * @package   enrol_ezpay
  * @copyright 2025 Fadli Saad <fadlisaad@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @var stdClass $plugin
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// Reference https://docs.moodle.org/dev/version.php.
+$capabilities = array(
+    'enrol/ezpay:config' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        )
+    ),
 
-$plugin->component = 'enrol_ezpay';
-$plugin->release = '1.0.9';
-$plugin->version = 2025041724;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->cron     = 60;
+    'enrol/ezpay:manage' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
+
+    'enrol/ezpay:unenrol' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        )
+    ),
+
+    'enrol/ezpay:unenrolself' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+        )
+    ),
+);

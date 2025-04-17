@@ -15,46 +15,72 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Settings for the EzPay payment gateway
+ * The admin global settings for inserting ezpay credentials
  *
- * @package    paygw_ezpay
- * @copyright  2025 Fadli Saad <fadlisaad@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   enrol_ezpay
+ * @copyright 2025 Fadli Saad <fadlisaad@gmail.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_heading('paygw_ezpay_settings',
-        get_string('pluginname', 'paygw_ezpay'),
-        get_string('pluginname_desc', 'paygw_ezpay')));
+    // Settings header
+    $settings->add(new admin_setting_heading(
+        'enrol_ezpay_settings',
+        get_string('pluginname', 'enrol_ezpay'),
+        get_string('pluginname_desc', 'enrol_ezpay')
+    ));
 
-    // Environment setting (staging/production)
-    $environment_options = array(
-        'staging' => get_string('environment_staging', 'paygw_ezpay'),
-        'production' => get_string('environment_production', 'paygw_ezpay')
-    );
-    $settings->add(new admin_setting_configselect('paygw_ezpay/environment',
-        get_string('environment', 'paygw_ezpay'),
-        get_string('environment_desc', 'paygw_ezpay'),
-        'staging',
-        $environment_options));
+    // Environment setting
+    $settings->add(new admin_setting_configselect(
+        'enrol_ezpay/environment',
+        get_string('environment', 'enrol_ezpay'),
+        get_string('environment_help', 'enrol_ezpay'),
+        'sandbox',
+        [
+            'sandbox' => get_string('environment_sandbox', 'enrol_ezpay'),
+            'production' => get_string('environment_production', 'enrol_ezpay')
+        ]
+    ));
 
-    $settings->add(new admin_setting_configtext('paygw_ezpay/merchantcode',
-        get_string('merchantcode', 'paygw_ezpay'),
-        get_string('merchantcode_desc', 'paygw_ezpay'),
+    // Merchant ID
+    $settings->add(new admin_setting_configtext(
+        'enrol_ezpay/merchant_code',
+        get_string('merchant_code', 'enrol_ezpay'),
+        get_string('merchant_code_help', 'enrol_ezpay'),
         '',
-        PARAM_TEXT));
+        PARAM_TEXT
+    ));
 
-    $settings->add(new admin_setting_configtext('paygw_ezpay/apiurl',
-        get_string('apiurl', 'paygw_ezpay'),
-        get_string('apiurl_desc', 'paygw_ezpay'),
-        '',
-        PARAM_URL));
-        
-    $settings->add(new admin_setting_configtext('paygw_ezpay/servicecode',
-        get_string('servicecode', 'paygw_ezpay'),
-        get_string('servicecode_desc', 'paygw_ezpay'),
-        '001',
-        PARAM_TEXT));
+    // Currency
+    $settings->add(new admin_setting_configtext(
+        'enrol_ezpay/currency',
+        get_string('currency', 'enrol_ezpay'),
+        get_string('currency_help', 'enrol_ezpay'),
+        'MYR',
+        PARAM_TEXT
+    ));
+
+    // Default enrolment duration
+    $settings->add(new admin_setting_configduration(
+        'enrol_ezpay/enrolperiod',
+        get_string('enrolperiod', 'enrol_ezpay'),
+        get_string('enrolperiod_desc', 'enrol_ezpay'),
+        0
+    ));
+
+    // Default role
+    if (!during_initial_install()) {
+        $options = get_default_enrol_roles(context_system::instance());
+        $student = get_archetype_roles('student');
+        $student = reset($student);
+        $settings->add(new admin_setting_configselect(
+            'enrol_ezpay/roleid',
+            get_string('defaultrole', 'enrol_ezpay'),
+            get_string('defaultrole_help', 'enrol_ezpay'),
+            $student->id,
+            $options
+        ));
+    }
 }

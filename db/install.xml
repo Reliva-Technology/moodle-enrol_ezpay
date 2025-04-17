@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="enrol/ezpay/db" VERSION="20250322" COMMENT="XMLDB file for Moodle enrol/ezpay"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="enrol_ezpay" COMMENT="All saved transaction using ezpay will be saved here. Do not uninstall ezpay if there are transactions using ezpay">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="merchant_order_id" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="receiver_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="receiver_email" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="response" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="payment_status" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="pending_reason" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="expiryperiod" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+        <KEY NAME="instanceid" TYPE="foreign" FIELDS="instanceid" REFTABLE="enrol" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="merchant_order_id" UNIQUE="true" FIELDS="merchant_order_id"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

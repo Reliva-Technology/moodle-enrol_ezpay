@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Controls the version for the ezpay enrolment plugin
+ * Status codes for ezpay payment gateway
  *
  * @package   enrol_ezpay
  * @copyright 2025 Fadli Saad <fadlisaad@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @var stdClass $plugin
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace enrol_ezpay;
 
-// Reference https://docs.moodle.org/dev/version.php.
-
-$plugin->component = 'enrol_ezpay';
-$plugin->release = '1.0.9';
-$plugin->version = 2025041724;
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->cron     = 60;
+/**
+ * Status codes for ezpay payment gateway
+ */
+class ezpay_status_codes {
+    const CHECK_STATUS_SUCCESS = '1';
+    const CHECK_STATUS_FAILED = '2';
+    const CHECK_STATUS_ATTEMPTED = '0';
+    const CHECK_STATUS_NOT_FOUND = '99';
+}
