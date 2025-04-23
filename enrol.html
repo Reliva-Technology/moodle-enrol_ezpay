@@ -1,37 +1,27 @@
-<div align="center">
-  <p>
-    <?php print_string("paymentrequired") ?>
-  </p>
-  <p>
-    <b>
-      <?php echo $instancename; ?>
-    </b>
-  </p>
-  <p>
-    <b>
-      <?php echo get_string("cost").": MYR {$localisedcost}"; ?>
-    </b>
-  </p>
-  <p>
-    <img
-      alt="<?php print_string('ezpayaccepted', 'enrol_ezpay') ?>"
-      src="<?php echo $OUTPUT->image_url('logo', 'enrol_ezpay') ?>"
-      style="width: 120px"
-    />
-  </p>
-  <p>
-    <?php print_string("paymentinstant") ?>
-  </p>
-
-  <form
-    action="<?php p($CFG->wwwroot . '/enrol/ezpay/call.php') ?>"
-    method="post"
-  >
-    <input type="hidden" name="id" value="<?php echo $course->id; ?>" />
-    <input type="hidden" name="instance" value="<?php echo $instance->id; ?>" />
-    <input
-      type="submit"
-      value="<?php print_string('sendpaymentbutton', 'enrol_ezpay' ) ?>"
-    />
-  </form>
+<div class="container d-flex justify-content-center align-items-center">
+  <div class="card shadow-sm" style="max-width: 400px; width: 100%;">
+    <div class="card-body text-center">
+      <div class="alert alert-info mb-3" role="alert">
+        <?php print_string("paymentrequired") ?>
+      </div>
+      <p class="card-text font-weight-bold mb-3">
+        <?php echo get_string("cost").": MYR {$localisedcost}"; ?>
+      </p>
+      <img
+        alt="<?php print_string('ezpayaccepted', 'enrol_ezpay') ?>"
+        src="<?php echo $OUTPUT->image_url('logo', 'enrol_ezpay') ?>"
+        class="mb-3"
+        style="width: 120px; display: block; margin: 0 auto;"
+      />
+      <p><?php print_string('supportedpaymentmethods', 'enrol_ezpay'); ?></p>
+      <p class="text-muted mb-4"><?php print_string("paymentinstant") ?></p>
+      <form action="<?php p($CFG->wwwroot . '/enrol/ezpay/call.php') ?>" method="post">
+        <input type="hidden" name="id" value="<?php echo $course->id; ?>" />
+        <input type="hidden" name="instance" value="<?php echo $instance->id; ?>" />
+        <button type="submit" class="btn btn-primary btn-block">
+          <?php print_string('sendpaymentbutton', 'enrol_ezpay' ) ?>
+        </button>
+      </form>
+    </div>
+  </div>
 </div>

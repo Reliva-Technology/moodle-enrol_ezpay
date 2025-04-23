@@ -89,8 +89,10 @@ if (method_exists($helper, 'create')) {
             $returnurl,
             $callbackurl
         );
+        debugging('Link', var_export($link, true));
     } catch (Exception $e) {
         $error = $e->getMessage();
+        
         debugging('EZPay payment creation failed: ' . $error, DEBUG_DEVELOPER);
         debugging('EZPay payment exception trace: ' . $e->getTraceAsString(), DEBUG_DEVELOPER);
         $DB->delete_records('enrol_ezpay', ['merchant_order_id' => $merchantorderid]);

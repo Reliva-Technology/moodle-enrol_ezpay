@@ -62,55 +62,46 @@ class ezpay_helper {
         $header = $this->header($body);
         $baseurl = $header['url'];
 
-        $curl = new \curl();
-        $options = [
-            'CURLOPT_RETURNTRANSFER' => true,
-            'CURLOPT_FOLLOWLOCATION' => true,
-            'CURLOPT_MAXREDIRS' => 10,
-            'CURLOPT_TIMEOUT' => 0,
-            'CURLOPT_HTTP_VERSION' => CURL_HTTP_VERSION_1_1,
-            'CURLOPT_CUSTOMREQUEST' => 'POST',
-            'CURLOPT_POSTFIELDS' => $header['body'],
-            'CURLOPT_HTTPHEADER' => [
-                'Content-Type: application/x-www-form-urlencoded'
-            ]
-        ];
-
-        debugging('POST body: ' . var_export($header['body'], true), DEBUG_DEVELOPER);
-        // Send as form-data, not JSON
-        $response = $curl->post($baseurl . $endpoint, $header['body'], $options);
-        debugging('EZPay raw response: ' . var_export($response, true), DEBUG_DEVELOPER);
-        if ($curl->error) {
-            debugging('cURL error: ' . $curl->error, DEBUG_DEVELOPER);
-            return ['err' => $curl->error];
-        } else {
-            // Try to decode JSON, but if not, just return raw
-            $data = json_decode($response, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                // Not JSON, return raw response
-                return ['err' => $response];
-            }
-            // If the decoded data contains an error, return it
-            if (isset($data['error'])) {
-                return [
-                    'err' => $data['error'],
-                    'code' => isset($data['code']) ? $data['code'] : null,
-                    'status' => isset($data['status']) ? $data['status'] : null
-                ];
-            } elseif (isset($data['message']) && (isset($data['status']) && strtolower($data['status']) === 'error')) {
-                return [
-                    'err' => $data['message'],
-                    'code' => isset($data['code']) ? $data['code'] : null,
-                    'status' => $data['status']
-                ];
-            } elseif (isset($data['message'])) {
-                return ['err' => $data['message']];
-            } elseif (isset($data['status']) && strtolower($data['status']) === 'error') {
-                return ['err' => isset($data['description']) ? $data['description'] : $data['status']];
-            }
-            // Otherwise, return the data as is
-            return ['res' => $data];
+        // Use native PHP cURL to send a true multipart/form-data request as required by the gateway
+        $url = $baseurl . $endpoint;
+        $fields = $header['body'];
+        $multipart = [];
+        foreach ($fields as $key => $value) {
+            $multipart[] = [
+                'name' => $key,
+                'contents' => $value
+            ];
         }
+
+        $ch = curl_init();
+        $postfields = [];
+        foreach ($multipart as $part) {
+            $postfields[$part['name']] = $part['contents'];
+        }
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        // Do not set Content-Type header manually
+
+        $response = curl_exec($ch);
+        $error = curl_error($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+
+        if ($error) {
+            return ['err' => $error];
+        }
+        // Build the response array similar to the sample response
+        // The final payment URL after redirects is already in $info['url'] (set by cURL)
+        return $info;
+
     }
 
     /**
@@ -143,7 +134,7 @@ class ezpay_helper {
             'AMOUNT' => number_format($price, 2, '.', ''),
             'MERCHANT_CODE' => $this->merchant_code,
             'SERVICE_CODE' => '001',
-            'RETURN_URL' => $returnurl,
+            'RETURN_URL' => $CFG->wwwroot . '/enrol/ezpay/callback.php?courseid=' . $courseid,
             'CANCEL_URL' => $cancelurl,
             'EMAIL' => $email,
             'SOURCE' => 'web',
@@ -154,16 +145,10 @@ class ezpay_helper {
         ];
 
         $response = $this->send('/payment/request', $body);
-        
-        if (isset($response['err'])) {
-            throw new \moodle_exception('errezpayconnect', 'enrol_ezpay', '', $response['err']);
+        if (is_array($response) && isset($response['url'])) {
+            return $response['url'];
         }
-
-        if (isset($response['res']['PAYMENT_URL'])) {
-            return $response['res']['PAYMENT_URL'];
-        }
-
-        throw new \moodle_exception('errezpayconnect', 'enrol_ezpay');
+        throw new \moodle_exception('errezpayconnect', 'enrol_ezpay', '', 'Failed to get payment URL from gateway response.');
     }
 
     /**
