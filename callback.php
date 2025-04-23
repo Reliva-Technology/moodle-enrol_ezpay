@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,14 +12,14 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Listens to any callbacks from ezpay.
  *
  * @package   enrol_ezpay
  * @copyright 2025 Fadli Saad <fadlisaad@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 use enrol_ezpay\ezpay_status_codes;
@@ -43,8 +43,7 @@ if (!enrol_is_enabled('ezpay')) {
     http_response_code(503);
     throw new moodle_exception('errdisabled', 'enrol_ezpay');
 }
-// sample response
-// http://localhost:8000/enrol/ezpay/callback.php?transaction_id=ezpay_68074ddcb201e&payment_status=1&ref_no=a1y1pRK1psBLQ76H&receipt_no=CM00025000012
+
 // Only support GET-based (redirect) callbacks
 if (!empty($_GET) && isset($_GET['payment_status']) && isset($_GET['transaction_id'])) {
     // --- Handle GET-based callback (user redirect after payment) ---
