@@ -74,7 +74,7 @@
                 {{^success}}
                     <div class="alert alert-danger mt-3">Payment failed or is pending. Please try again or contact support.</div>
 
-                    <form method="get" action="">
+                    <form method="get" action="{{requery_url}}">
                         <input type="hidden" name="ref_no" value="{{transaction_id}}">
                         <button type="submit" class="btn btn-warning">Requery Payment Status</button>
                     </form>
