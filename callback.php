@@ -76,8 +76,8 @@ $existingdata = $DB->get_record('enrol_ezpay', ['merchant_order_id' => $merchant
         $existingdata->timeupdated = time();
         $DB->update_record('enrol_ezpay', $existingdata);
 
-        // Enrol the user in the course if not already enrolled
-        if (!empty($existingdata->userid)) {
+        // Enrol the user in the course if not already enrolled and status is success
+        if (!empty($existingdata->userid) && $paymentstatus == '1') {
             $userid = $existingdata->userid;
             $enrol = enrol_get_plugin('ezpay');
             $instances = enrol_get_instances($existingdata->courseid, true);
