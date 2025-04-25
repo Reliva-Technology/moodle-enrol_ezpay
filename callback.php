@@ -108,7 +108,8 @@ $existingdata = $DB->get_record('enrol_ezpay', ['merchant_order_id' => $merchant
         'course_url' => $course_url,
         'return_header' => get_string('payment_successful', 'enrol_ezpay'),
         'return_sub_header' => get_string('thank_you_payment', 'enrol_ezpay'),
-        'logo' => $OUTPUT->image_url('logo', 'enrol_ezpay')
+        'logo' => $OUTPUT->image_url('logo', 'enrol_ezpay'),
+        'requery_url' => (new moodle_url('/enrol/requery.php', ['id' => $existingdata->courseid]))
     ];
     $PAGE->set_url('/enrol/ezpay/callback.php');
     $PAGE->set_title(get_string('payment_successful', 'enrol_ezpay'));
