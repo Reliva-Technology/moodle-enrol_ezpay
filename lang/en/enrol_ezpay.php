@@ -79,6 +79,7 @@ $string['merchant_key_help'] = 'The merchant key that EZPay gave you';
 // Error messages
 $string['errdisabled'] = 'The EZPay enrolment plugin is disabled and does not handle payment notifications.';
 $string['erripninvalid'] = 'Instant payment notification has not been verified by EZPay.';
+$string['err_invalid_response'] = 'Invalid Response from ezpay. Please contact iium_ezpay@iium.edu.my';
 $string['errezpayconnect'] = 'Could not connect to EZPay. Please try again later.';
 $string['errezpayfailed'] = 'Payment has not been confirmed. Please contact the course administrator.';
 $string['errezpayinvalid'] = 'The payment has not been validated by EZPay';
@@ -95,9 +96,11 @@ $string['status_failed'] = 'Failed';
 $string['status_cancelled'] = 'Cancelled';
 $string['status_refunded'] = 'Refunded';
 $string['status_chargeback'] = 'Chargeback';
+$string['payment_pending_message'] = 'Your payment is being processed.';
 
 // Buttons and labels
 $string['sendpaymentbutton'] = 'Pay with EZPay';
+$string['payment_failed_or_pending'] = 'Payment failed or is pending. Please try again or contact support. In case your bank account or credit/debit card has been deducted, do not attempt to pay again and you can use the requery button to check the status of your payment.';
 $string['cost_preview'] = 'Course cost: {$a}';
 $string['paymentrequired'] = 'You must make a payment to access this course.';
 $string['nocost'] = 'There is no cost associated with enrolling in this course!';
@@ -132,3 +135,7 @@ $string['ezpay:unenrolself'] = 'Unenrol self from course';
 
 // Other strings
 $string['thank_you_payment'] = 'Thank you for your payment. You have been successfully enrolled in the course.';
+$string['transactions'] = 'Transactions';
+$string['transaction_id'] = 'Transaction ID';
+$string['backtocourse'] = 'Back to course';
+$string['requery_payments_task'] = 'Requery pending EZPay payments';
