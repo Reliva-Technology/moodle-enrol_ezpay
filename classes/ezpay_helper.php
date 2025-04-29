@@ -73,28 +73,19 @@ class ezpay_helper {
             ];
         }
 
-        $ch = curl_init();
-        $postfields = [];
-        foreach ($multipart as $part) {
-            $postfields[$part['name']] = $part['contents'];
-        }
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 0);
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        // Do not set Content-Type header manually
-
-        $response = curl_exec($ch);
-        $error = curl_error($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
-
+        require_once($CFG->libdir . '/filelib.php');
+        $curl = new \curl();
+        $options = [
+            'CURLOPT_FOLLOWLOCATION' => true,
+            'CURLOPT_MAXREDIRS' => 10,
+            'CURLOPT_TIMEOUT' => 0,
+            'CURLOPT_HTTP_VERSION' => CURL_HTTP_VERSION_1_1,
+            'CURLOPT_SSL_VERIFYPEER' => false,
+            'CURLOPT_SSL_VERIFYHOST' => false,
+        ];
+        $response = $curl->post($url, $fields, $options);
+        $error = $curl->get_errno() ? $curl->error : null;
+        $info = $curl->get_info();
         if ($error) {
             return ['err' => $error];
         }
@@ -172,4 +163,61 @@ class ezpay_helper {
         $event = \enrol_ezpay\event\ezpay_request_log::create($eventarray);
         $event->trigger();
     }
+
+    /**
+     * Update transaction record and enrol user if needed.
+     *
+     * @param string $merchantorderid
+     * @param string $paymentstatus
+     * @param string $receiptno
+     * @param string $refno
+     * @return array|null [course_name, course_url, existingdata] or null if not found
+     */
+    public function update_transaction_and_enrol_user($merchantorderid, $paymentstatus, $receiptno, $refno) {
+        global $DB, $CFG;
+        $existingdata = $DB->get_record('enrol_ezpay', ['merchant_order_id' => $merchantorderid]);
+        $course_name = '';
+        $course_url = '';
+        if ($existingdata) {
+            $existingdata->payment_status = $paymentstatus == '1' ? 'Success' : 'Failed';
+            $existingdata->pending_reason = get_string('log_callback', 'enrol_ezpay');
+            $existingdata->response = json_encode([
+                'payment_status' => $paymentstatus,
+                'transaction_id' => $merchantorderid,
+                'ref_no' => $refno,
+                'receipt_no' => $receiptno
+            ]);
+            $existingdata->timeupdated = time();
+            $DB->update_record('enrol_ezpay', $existingdata);
+
+            // Enrol the user in the course if not already enrolled and payment status is success
+            if (!empty($existingdata->userid) && $paymentstatus == '1') {
+                $userid = $existingdata->userid;
+                $enrol = enrol_get_plugin('ezpay');
+                $instances = enrol_get_instances($existingdata->courseid, true);
+                $instance = null;
+                foreach ($instances as $i) {
+                    if ($i->enrol === 'ezpay') {
+                        $instance = $i;
+                        break;
+                    }
+                }
+                if ($enrol && $instance && $userid) {
+                    $enrol->enrol_user($instance, $userid, $instance->roleid, time());
+                }
+            }
+            // get course detail
+            $course = $DB->get_record('course', ['id' => $existingdata->courseid]);
+            if ($course) {
+                $course_name = $course->fullname;
+                $course_url = (new \moodle_url('/course/view.php', ['id' => $existingdata->courseid]))->out(false);
+            }
+        }
+        return $existingdata ? [
+            'course_name' => $course_name,
+            'course_url' => $course_url,
+            'existingdata' => $existingdata
+        ] : null;
+    }
 }
+
