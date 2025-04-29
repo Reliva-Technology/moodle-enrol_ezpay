@@ -1,0 +1,24 @@
+<div class="ezpay-requery-container">
+  <div class="card shadow-sm mt-5 mx-auto" style="max-width: 500px;">
+    <div class="card-header">
+      {{transactions}}
+    </div>
+    <div class="card-body text-center">
+      <p><strong>{{transaction_id_label}}:</strong> {{transaction_id}}</p>
+      <p><strong>{{status_label}}:</strong> <span class="badge badge-{{status_class}}">{{status_string}}</span></p>
+      {{#error}}
+      <div class="alert alert-danger mt-3">{{error}}</div>
+      {{/error}}
+      <a href="{{course_url}}" class="btn btn-primary mt-4">{{return_to_course}}</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.ezpay-requery-container {
+    margin-top: 2rem;
+}
+.badge-success { background-color: #28a745; }
+.badge-pending { background-color: #ffc107; color: #212529; }
+.badge-failed, .badge-error { background-color: #dc3545; }
+</style>
