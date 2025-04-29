@@ -475,17 +475,17 @@ class enrol_ezpay_plugin extends enrol_plugin {
         $createlink = $ezpayhelper->create($product, $qty, $price, $name, $phone, $email, $returnurl, $callbackurl);
 
         if (!empty($createlink['err'])) {
-            throw new Exception('Invalid Response from ezpay. Please contact support@ezpay.com');
+            throw new Exception(get_string('err_invalid_response', 'enrol_ezpay'));
             exit;
         }
 
         if (empty($createlink['res'])) {
-            throw new Exception('Request Failed: Invalid Response from ezpay. Please contact support@ezpay.com');
+            throw new Exception(get_string('err_invalid_response', 'enrol_ezpay'));
             exit;
         }
 
         if (empty($createlink['res']['Data']['Url'])) {
-            throw new Exception('Invalid request. Response ezpay: ' . $createlink['res']['Message']);
+            throw new Exception(get_string('err_invalid_response', 'enrol_ezpay'));
             exit;
         }
 
