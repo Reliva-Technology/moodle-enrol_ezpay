@@ -44,74 +44,59 @@ if (!enrol_is_enabled('ezpay')) {
     throw new moodle_exception('errdisabled', 'enrol_ezpay');
 }
 
+// Securely fetch input parameters using Moodle's optional_param() for security compliance.
+$paymentstatus = optional_param('payment_status', null, PARAM_ALPHANUMEXT);
+$merchantorderid = optional_param('transaction_id', null, PARAM_ALPHANUMEXT);
+$refno = optional_param('ref_no', null, PARAM_ALPHANUMEXT);
+$receiptno = optional_param('receipt_no', '', PARAM_ALPHANUMEXT);
+
 // Only support GET-based (redirect) callbacks
-if (!empty($_GET) && isset($_GET['payment_status']) && isset($_GET['transaction_id'])) {
+if (!empty($paymentstatus) && !empty($merchantorderid)) {
     // --- Handle GET-based callback (user redirect after payment) ---
-    $merchantorderid = $_GET['transaction_id'];
-    $paymentstatus = $_GET['payment_status'];
-
     // Handle requery from the form (if only ref_no is present)
-if (!empty($_GET['ref_no']) && empty($_GET['payment_status'])) {
-    $helper = new ezpay_helper();
-    $response = $helper->check_transaction($_GET['ref_no']);
-    // Map gateway response to expected GET keys for display
-    $_GET['payment_status'] = $response['payment_status'] ?? '0';
-    $_GET['transaction_id'] = $_GET['ref_no'];
-    $_GET['receipt_no'] = $response['receipt_no'] ?? '';
-    // Optionally map other fields from $response as needed
-    $merchantorderid = $_GET['transaction_id'];
-    $paymentstatus = $_GET['payment_status'];
-} else {
-    $merchantorderid = $_GET['transaction_id'];
-    $paymentstatus = $_GET['payment_status'];
-}
-// Get transaction record
-$existingdata = $DB->get_record('enrol_ezpay', ['merchant_order_id' => $merchantorderid]);
-
-    if ($existingdata) {
-
-        $existingdata->payment_status = $paymentstatus == '1' ? 'Success' : 'Failed';
-        $existingdata->pending_reason = get_string('log_callback', 'enrol_ezpay');
-        $existingdata->response = json_encode($_GET);
-        $existingdata->timeupdated = time();
-        $DB->update_record('enrol_ezpay', $existingdata);
-
-        // Enrol the user in the course if not already enrolled
-        if (!empty($existingdata->userid)) {
-            $userid = $existingdata->userid;
-            $enrol = enrol_get_plugin('ezpay');
-            $instances = enrol_get_instances($existingdata->courseid, true);
-            $instance = null;
-            foreach ($instances as $i) {
-                if ($i->enrol === 'ezpay') {
-                    $instance = $i;
-                    break;
-                }
-            }
-            if ($enrol && $instance && $userid) {
-                $enrol->enrol_user($instance, $userid, $instance->roleid, time());
-            }
-        }
-
-        // get course detail
-        $course = $DB->get_record('course', ['id' => $existingdata->courseid]);
-        $course_name = $course->fullname;
-        $course_url = (new moodle_url('/course/view.php', ['id' => $existingdata->courseid]))->out(false);
+    if (!empty($refno) && empty($paymentstatus)) {
+        $helper = new ezpay_helper();
+        $response = $helper->check_transaction($refno);
+        // Map gateway response to expected keys for display
+        $paymentstatus = $response['payment_status'] ?? '0';
+        $merchantorderid = $refno;
+        $receiptno = $response['receipt_no'] ?? '';
+        // Optionally map other fields from $response as needed
+    }
+    // Update transaction record and enrol user using helper
+    $helper = new \enrol_ezpay\ezpay_helper();
+    $result = $helper->update_transaction_and_enrol_user($merchantorderid, $paymentstatus, $receiptno, $refno);
+    if ($result) {
+        $course_name = $result['course_name'];
+        $course_url = $result['course_url'];
+        $existingdata = $result['existingdata'];
     }
 
     // Prepare template data
     $templatedata = [
-        'success' => $paymentstatus == '1',
-        'receipt_no' => $_GET['receipt_no'] ?? '',
-        'transaction_id' => $_GET['ref_no'] ?? '',
+        'success' => $paymentstatus,
+        'success_is_1' => ($paymentstatus == '1'),
+        'receipt_no' => $receiptno,
+        'transaction_id' => $merchantorderid,
         'course_name' => $course_name,
         'course_url' => $course_url,
-        'return_header' => get_string('payment_successful', 'enrol_ezpay'),
-        'return_sub_header' => get_string('thank_you_payment', 'enrol_ezpay'),
-        'logo' => $OUTPUT->image_url('logo', 'enrol_ezpay')
+        'return_header' => (
+            $paymentstatus == '1' ? get_string('payment_successful', 'enrol_ezpay') :
+            ($paymentstatus == '0' ? get_string('status_pending', 'enrol_ezpay') : get_string('status_failed', 'enrol_ezpay'))
+        ),
+        'return_sub_header' => (
+            $paymentstatus == '1' ? get_string('thank_you_payment', 'enrol_ezpay') :
+            ($paymentstatus == '0' ? get_string('payment_pending_message', 'enrol_ezpay') : get_string('payment_failed_or_pending', 'enrol_ezpay'))
+        ),
+        'logo' => $OUTPUT->image_url('logo', 'enrol_ezpay'),
+        'requery_url' => $CFG->wwwroot . '/enrol/ezpay/requery.php',
+        'payment_failed_message' => get_string('payment_failed_or_pending', 'enrol_ezpay'),
     ];
     $PAGE->set_url('/enrol/ezpay/callback.php');
-    $PAGE->set_title(get_string('payment_successful', 'enrol_ezpay'));
+    $PAGE->set_title(
+    $paymentstatus == '1' ? get_string('payment_successful', 'enrol_ezpay') :
+    ($paymentstatus == '0' ? get_string('payment_pending', 'enrol_ezpay') : get_string('payment_failed', 'enrol_ezpay'))
+);
     $PAGE->set_heading($course_name);
     echo $OUTPUT->header();
     echo $OUTPUT->render_from_template('enrol_ezpay/ezpay_callback', $templatedata);

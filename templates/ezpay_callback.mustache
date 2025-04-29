@@ -43,9 +43,8 @@
             <div class="text-center mb-4">
                 <img src="{{logo}}" alt="EZPay Logo" style="max-width:180px; height:auto; margin: 0 auto; display: block;" />
             </div>
-            {{#success}}
+            {{#success_is_1}}
             <p class="text-center mb-4">{{return_sub_header}}</p>
-            
             <div class="payment-details">
                 <table class="table">
                     <tbody>
@@ -65,21 +64,19 @@
                 </table>
                 <pre>{{data}}</pre>
             </div>
-
             <div class="text-center mt-4">
                 <a href="{{course_url}}" class="btn btn-primary">Go to Course</a>
             </div>
-            {{/success}}
+            {{/success_is_1}}
+            {{^success_is_1}}
             <div class="text-center mt-4">
-                {{^success}}
-                    <div class="alert alert-danger mt-3">Payment failed or is pending. Please try again or contact support.</div>
-
-                    <form method="get" action="">
-                        <input type="hidden" name="ref_no" value="{{transaction_id}}">
-                        <button type="submit" class="btn btn-warning">Requery Payment Status</button>
-                    </form>
-                {{/success}}
+                <div class="alert alert-danger mt-3">{{payment_failed_message}}</div>
+                <form method="get" action="{{requery_url}}">
+                    <input type="hidden" name="ref_no" value="{{transaction_id}}">
+                    <button type="submit" class="btn btn-warning">Requery Payment Status</button>
+                </form>
             </div>
+            {{/success_is_1}}
         </div>
     </div>
 </div>
