@@ -54,7 +54,7 @@ if ($cost <= 0) {
 
 // Set up payment data
 $merchantorderid = uniqid('ezpay_');
-$returnurl = "$CFG->wwwroot/course/view.php?id=$course->id";
+$returnurl = "$CFG->wwwroot/enrol/index.php?id=$course->id";
 $callbackurl = "$CFG->wwwroot/enrol/ezpay/callback.php?merchantorderid=$merchantorderid";
 // Create enrolment record
 $enroldata = new stdClass();
