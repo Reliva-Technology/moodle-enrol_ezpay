@@ -28,8 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 // Reference https://docs.moodle.org/dev/version.php.
 
 $plugin->component = 'enrol_ezpay';
-$plugin->release = '1.0.11';
-$plugin->version = 2025071335;
+$plugin->release = '1.0.12';
+$plugin->version = 202511135;
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->cron     = 60;

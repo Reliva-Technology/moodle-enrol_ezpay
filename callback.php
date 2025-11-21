@@ -49,6 +49,9 @@ $paymentstatus = optional_param('payment_status', null, PARAM_ALPHANUMEXT);
 $merchantorderid = optional_param('transaction_id', null, PARAM_ALPHANUMEXT);
 $refno = optional_param('ref_no', null, PARAM_ALPHANUMEXT);
 $receiptno = optional_param('receipt_no', '', PARAM_ALPHANUMEXT);
+$courseid = optional_param('courseid', null, PARAM_INT);
+
+
 
 // Only support GET-based (redirect) callbacks
 if (!empty($paymentstatus) && !empty($merchantorderid)) {
@@ -56,7 +59,7 @@ if (!empty($paymentstatus) && !empty($merchantorderid)) {
     // Handle requery from the form (if only ref_no is present)
     if (!empty($refno) && empty($paymentstatus)) {
         $helper = new ezpay_helper();
-        $response = $helper->check_transaction($refno);
+        $response = $helper->check_transaction($refno,);
         // Map gateway response to expected keys for display
         $paymentstatus = $response['payment_status'] ?? '0';
         $merchantorderid = $refno;
@@ -66,6 +69,9 @@ if (!empty($paymentstatus) && !empty($merchantorderid)) {
     // Update transaction record and enrol user using helper
     $helper = new \enrol_ezpay\ezpay_helper();
     $result = $helper->update_transaction_and_enrol_user($merchantorderid, $paymentstatus, $receiptno, $refno);
+
+
+
     if ($result) {
         $course_name = $result['course_name'];
         $course_url = $result['course_url'];
@@ -91,6 +97,7 @@ if (!empty($paymentstatus) && !empty($merchantorderid)) {
         'logo' => $OUTPUT->image_url('logo', 'enrol_ezpay'),
         'requery_url' => $CFG->wwwroot . '/enrol/ezpay/requery.php',
         'payment_failed_message' => get_string('payment_failed_or_pending', 'enrol_ezpay'),
+        'courseid' => $courseid,
     ];
     $PAGE->set_url('/enrol/ezpay/callback.php');
     $PAGE->set_title(

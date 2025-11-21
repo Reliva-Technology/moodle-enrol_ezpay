@@ -55,13 +55,14 @@ class ezpay_helper {
         ];
     }
 
-    public function send($endpoint, $body) {
+    public function send($endpoint, $body, $method = 'POST') {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
 
         $header = $this->header($body);
         $baseurl = $header['url'];
 
+   
         // Use native PHP cURL to send a true multipart/form-data request as required by the gateway
         $url = $baseurl . $endpoint;
         $fields = $header['body'];
@@ -83,17 +84,90 @@ class ezpay_helper {
             'CURLOPT_SSL_VERIFYPEER' => false,
             'CURLOPT_SSL_VERIFYHOST' => false,
         ];
-        $response = $curl->post($url, $fields, $options);
+
+
+        if ($method == 'GET') {
+            $response = $curl->get($url, $fields, $options);
+        } else {
+            $response = $curl->post($url, $fields, $options);
+        }
+    
         $error = $curl->get_errno() ? $curl->error : null;
-        $info = $curl->get_info();
+
+        // $info = $curl->get_info();
         if ($error) {
             return ['err' => $error];
         }
         // Build the response array similar to the sample response
         // The final payment URL after redirects is already in $info['url'] (set by cURL)
-        return $info;
+
+        return $response;
 
     }
+
+
+
+    public function send_info($endpoint, $body, $method = 'POST') {
+        global $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+
+        $header = $this->header($body);
+        $baseurl = $header['url'];
+
+   
+        // Use native PHP cURL to send a true multipart/form-data request as required by the gateway
+        $url = $baseurl . $endpoint;
+        $fields = $header['body'];
+        $multipart = [];
+        foreach ($fields as $key => $value) {
+            $multipart[] = [
+                'name' => $key,
+                'contents' => $value
+            ];
+        }
+
+        require_once($CFG->libdir . '/filelib.php');
+        $curl = new \curl();
+        $options = [
+            'CURLOPT_FOLLOWLOCATION' => true,
+            'CURLOPT_MAXREDIRS' => 10,
+            'CURLOPT_TIMEOUT' => 0,
+            'CURLOPT_HTTP_VERSION' => CURL_HTTP_VERSION_1_1,
+            'CURLOPT_SSL_VERIFYPEER' => false,
+            'CURLOPT_SSL_VERIFYHOST' => false,
+        ];
+
+
+        if ($method == 'GET') {
+            $response = $curl->get($url, $fields, $options);
+        } else {
+            $response = $curl->post($url, $fields, $options);
+        }
+      
+        $error = $curl->get_errno() ? $curl->error : null;
+
+        // $info = $curl->get_info();
+        if ($error) {
+            return ['err' => $error];
+        }
+        // Build the response array similar to the sample response
+        // The final payment URL after redirects is already in $info['url'] (set by cURL)
+
+        return $curl->get_info();
+
+    }
+
+    // public function get_trans_status($transactionid, $merchant_code) {
+    //     global $CFG;
+    //     require_once($CFG->libdir . '/filelib.php');
+
+    //     $header = $this->header($body);
+    //     $baseurl = $header['url'];
+
+        
+        
+
+    // }
 
     /**
      * Create a payment request
@@ -135,10 +209,14 @@ class ezpay_helper {
             'PAYMENT_DETAILS' => $productname
         ];
 
-        $response = $this->send('/payment/request', $body);
+        $response = $this->send_info('/payment/request', $body, 'POST');
+
+
         if (is_array($response) && isset($response['url'])) {
+
             return $response['url'];
         }
+        
         throw new \moodle_exception('errezpayconnect', 'enrol_ezpay', '', 'Failed to get payment URL from gateway response.');
     }
 
@@ -150,13 +228,16 @@ class ezpay_helper {
      * @return array Response from EZPay
      */
     public function check_transaction($transactionid, $account = null) {
-        $body = [
-            'TRANS_ID' => $transactionid,
-            'MERCHANT_CODE' => $this->merchant_code,
-            'SERVICE_CODE' => '001'
-        ];
+       
+        // print_r($transactionid, $this->merchant_code);
 
-        return $this->send('/payment/requery', $body);
+        return $this->send('/api/payment/requery/'.$transactionid. "/".$this->merchant_code,[] ,  method: 'GET');
+    }
+
+    public function get_course_id_from_transactionid($transactionid) {
+        global $DB;
+        $record = $DB->get_record('enrol_ezpay', ['merchant_order_id' => $transactionid]);
+        return $record->courseid;
     }
 
     public function log_request($eventarray) {
