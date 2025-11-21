@@ -27,6 +27,11 @@ if (empty($ref_no)) {
 $helper = new \enrol_ezpay\ezpay_helper();
 $response = $helper->check_transaction($ref_no);
 
+$courseid = $helper->get_course_id_from_transactionid($ref_no);
+
+
+
+
 // Prepare status for display
 $status = 'unknown';
 $statusstring = '';
@@ -56,8 +61,8 @@ if (is_array($response)) {
 
 // Prepare template data for Mustache
 $course_url = '';
-if (!empty($response['courseid'])) {
-    $course_url = (new moodle_url('/course/view.php', ['id' => $response['courseid']]))->out(false);
+if (!empty($courseid)) {
+    $course_url = (new moodle_url('/course/view.php', ['id' => $courseid]))->out(false);
 }
 $template_data = [
     'transactions' => get_string('transactions', 'enrol_ezpay'),

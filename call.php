@@ -54,7 +54,7 @@ if ($cost <= 0) {
 
 // Set up payment data
 $merchantorderid = uniqid('ezpay_');
-$returnurl = "$CFG->wwwroot/enrol/index.php?id=$course->id";
+$returnurl = "$CFG->wwwroot/course/view.php?id=$course->id";
 $callbackurl = "$CFG->wwwroot/enrol/ezpay/callback.php?merchantorderid=$merchantorderid";
 // Create enrolment record
 $enroldata = new stdClass();
@@ -78,6 +78,7 @@ $error = null;
 
 // Attempt to create the payment link
 if (method_exists($helper, 'create')) {
+
     try {
         $link = $helper->create(
             $merchantorderid,
@@ -92,6 +93,7 @@ if (method_exists($helper, 'create')) {
         debugging('Link', var_export($link, true));
     } catch (Exception $e) {
         $error = $e->getMessage();
+
         
         debugging('EZPay payment creation failed: ' . $error, DEBUG_DEVELOPER);
         debugging('EZPay payment exception trace: ' . $e->getTraceAsString(), DEBUG_DEVELOPER);
